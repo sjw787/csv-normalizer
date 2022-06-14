@@ -1,6 +1,6 @@
 # CSV-Normalizer
 CSV Normalizer makes it easy to normalize your CSV files! 
-CSV writer uses only the python standard library, so it can be used wherever Python 3.7 and up can! 
+CSV Normalizer uses only the python standard library, so it can be used wherever Python 3.7 and up can! 
 
 ## Installation
 1. Make sure you are using Python 3.7+ (visit: https://www.python.org/downloads for the latest downloads!)
