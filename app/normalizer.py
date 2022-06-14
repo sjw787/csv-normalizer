@@ -26,12 +26,12 @@ class NormalizedRow:
         bar_duration: str,
         notes: str,
     ):
-        self.timestamp = self.convert_to_rcf_3339(self.encode(timestamp))
+        self.timestamp = convert_to_rcf_3339(self.encode(timestamp).decode())
         self.address = self.encode(address)
         self.zip_code = self.encode(zip_code).zfill(5)
         self.full_name = self.encode(full_name).upper()
-        self.foo_duration = self.to_seconds(foo_duration)
-        self.bar_duration = self.to_seconds(bar_duration)
+        self.foo_duration = to_seconds(foo_duration)
+        self.bar_duration = to_seconds(bar_duration)
         self.total_duration = self.foo_duration + self.bar_duration
         self.notes = self.encode(notes)
 
@@ -41,7 +41,7 @@ class NormalizedRow:
         return self.data[item]
 
     def encode(self, string: str, encoding: str = "utf-8") -> str:
-        return string.encode(encoding, errors="replace").decode()
+        return string.encode(encoding, errors="replace")
 
     def apply_map(self, column_order, column_mapping, newline: str = "\n"):
         line = str()
@@ -51,27 +51,27 @@ class NormalizedRow:
 
         return row
 
-    def to_seconds(self, time_string: str) -> float:
-        hours, minutes, rest = time_string.split(":")
-        seconds, microseconds = rest.split(".")
+def to_seconds(time_string: str) -> float:
+    hours, minutes, rest = time_string.split(":")
+    seconds, microseconds = rest.split(".")
 
-        return timedelta(
-            hours=int(hours),
-            minutes=int(minutes),
-            seconds=int(seconds),
-            microseconds=int(microseconds),
-        ).total_seconds()
+    return timedelta(
+        hours=int(hours),
+        minutes=int(minutes),
+        seconds=int(seconds),
+        microseconds=int(microseconds),
+    ).total_seconds()
 
-    def convert_to_rcf_3339(self, timestamp: str) -> str:
-        """
-        Converts a timestamp string with format '%m/%d/%y %H:%M:%S %p' to RCF 3339
-        :param timestamp: a date time string
-        :return:
-        """
-        format = "%m/%d/%y %H:%M:%S %p"
-        pacific_to_eastern = timedelta(hours=3)  # Difference between EST and PDT
-        pacific_time = datetime.strptime(timestamp, format)
-        return (pacific_time + pacific_to_eastern).isoformat()
+def convert_to_rcf_3339(timestamp: str) -> str:
+    """
+    Converts a timestamp string with format '%m/%d/%y %H:%M:%S %p' to RCF 3339
+    :param timestamp: a date time string
+    :return:
+    """
+    format = "%m/%d/%y %H:%M:%S %p"
+    pacific_to_eastern = timedelta(hours=3)  # Difference between EST and PDT
+    pacific_time = datetime.strptime(timestamp, format)
+    return (pacific_time + pacific_to_eastern).isoformat()
 
 
 def normalize_csv_data(input_csv_path: str, output_csv_path: str) -> None:
@@ -89,7 +89,7 @@ def normalize_csv_data(input_csv_path: str, output_csv_path: str) -> None:
     }
 
     with open(input_csv_path, mode="r") as read_obj:
-        with open(output_csv_path, mode="w", encoding="utf-8", newline="\n") as write_obj:
+        with open(output_csv_path, mode="w", encoding="utf-8") as write_obj:
             csv_dict_reader = DictReader(read_obj)
             column_names = csv_dict_reader.fieldnames
             csv_dict_writer = DictWriter(write_obj, fieldnames=column_names)
@@ -130,7 +130,7 @@ def parse_args(arguments: list) -> dict:
     )
     parser.add_argument(
         "output_file",
-        help="The path to the output file where normalized data will be written",
+        help="Path to the output file where normalized data will be written",
     )
 
     return parser.parse_args(arguments)
